@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models">
+  <meta name="keywords" content="Diffusion, GenAI, Image Generation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', '{{ site.google_analytics }}');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/js/all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://rizavelioglu.github.io/">Riza Velioglu</a>,</span>
+            <span class="author-block">
+              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/460726592/">Petra Bevandić</a>,</span>
+            <span class="author-block">
+              <a href="https://robinchan.de/">Robin Chan</a>,</span>
+            <span class="author-block">
+              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/18302458/">Barbara Hammer</a>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Machine Learning Group, CITEC, Bielefeld University</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper(soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv(soon)</span>
+                </a>
+              </span>
+              <!-- Video Link. -->
+              <span class="link-block">
+                <a href="https://www.youtube.com/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video(soon)</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/rizavelioglu/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code(soon)</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/rizavelioglu/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"
+                       style="margin-left: -10px; margin-right: 5px">
+                  <span>Data(soon)</span>
+                  </a>
+              </span>
+              <!-- Model Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/rizavelioglu/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"
+                       style="margin-left: -10px; margin-right: 5px">
+                  <span>Model(soon)</span>
+                  </a>
+              </span>
+              <!-- HF Spaces Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/spaces/rizavelioglu/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"
+                       style="margin-left: -10px; margin-right: 5px">
+                  <span>Demo(soon)</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Image carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="teaser-carousel" class="carousel teaser-carousel">
+        <div class="item"><img src="static/images/whole_test_1.jpg" alt="Bounding box predictions on a shoe product image."/></div>
+        <div class="item"><img src="static/images/whole_test_2.jpg" alt="Bounding box predictions on a bag product image."/></div>
+      </div>
+      <!-- Add a single caption covering all the images -->
+      <h4 class="has-text-centered">
+        Predictions of <i>TryOffDiff</i> on the samples from the <i>VITON-HD-test</i> set.
+      </h4>
+    </div>
+  </div>
+</section>
+<!-- End image carousel -->
+
+
+<!-- Abstract & Video -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            This paper introduces <i>Virtual Try-Off</i> (<b>VTOFF</b>), a novel task focused on generating standardized garment
+            images from single photos of clothed individuals. Unlike traditional Virtual Try-On (VTON), which digitally
+            dresses models, VTOFF aims to extract a canonical garment image, posing unique challenges in capturing
+            garment shape, texture, and intricate patterns. This well-defined target makes VTOFF particularly effective
+            for evaluating reconstruction fidelity in generative models. We present <i>TryOffDiff</i>, a model that adapts
+            Stable Diffusion with SigLIP-based visual conditioning to ensure high fidelity and detail retention.
+            Experiments on a modified VITON-HD dataset show that our approach outperforms baseline methods based on
+            pose transfer and virtual try-on with fewer pre- and post-processing steps. Our analysis reveals that
+            traditional image generation metrics inadequately assess reconstruction quality, prompting us to rely on
+            DISTS for more accurate evaluation. Our results highlight the potential of VTOFF to enhance product imagery
+            in e-commerce applications, advance generative model evaluation, and inspire future work on high-fidelity
+            reconstruction.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Paper video. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe src="https://www.youtube.com/embed/..."
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    <!--/ Paper video. -->
+  </div>
+</section>
+<!-- End Abstract & Video -->
+
+
+<!-- Scale & Context -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-4 has-text-centered">Scale</h2>
+      <p>
+        lorem ipsum
+      </p>
+      <div class="carousel scale-carousel">
+        <div class="item"><img src="static/images/scale-zarashoe.jpg" alt=""/></div>
+        <div class="item"><img src="static/images/scale-glasses.jpg" alt=""/></div>
+        <div class="item"><img src="static/images/scale-adishoe.jpg" alt=""/></div>
+      </div>
+      <br>
+      <h2 class="title is-4 has-text-centered">Context</h2>
+      <p>
+        lorem ipsum
+      </p>
+      <br>
+      <img src="static/images/context-watch.jpg" alt="MY ALT TEXT"/>
+    </div>
+  </div>
+</section>
+<!-- Scale & Context -->
+
+
+<!-- Results -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Results</h2>
+      <p>
+        lorem ipsum
+      </p>
+    <br>
+      <div class="carousel teaser-carousel">
+        <div class="item"><img src="static/images/preds-glasses.jpg" alt=""/></div>
+        <div class="item"><img src="static/images/preds-shoe_1.jpg" alt=""/></div>
+      </div>
+    <p>
+      <br>
+      lorem ipsum
+    </p>
+    <br>
+    <div class="carousel teaser-carousel">
+      <div class="item"><img src="static/images/preds-multi0.jpg" alt=""/></div>
+      <div class="item"><img src="static/images/preds-multi1.jpg" alt=""/></div>
+      <div class="item"><img src="static/images/preds-multi2.jpg" alt=""/></div>
+    </div>
+  </div>
+</section>
+<!-- Results -->
+
+
+<!-- BibTeX Citation -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{velioglu2024tryoffdiff,
+  author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
+  title     = {},
+  booktitle = {},
+  year      = {},
+  doi       = {},
+  eprint    = {}
+}</code></pre>
+  </div>
+</section>
+<!-- BibTeX Citation -->
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://rizavelioglu.github.io/">
+        <i class="fa-solid fa-house"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/rizavelioglu">
+        <i class="fa-brands fa-github"></i>
+      </a>
+      <a class="icon-link" href="https://x.com/rizavelioglu">
+        <i class="fa-brands fa-square-x-twitter"></i>
+      </a>
+      <a class="icon-link" href="https://linkedin.com/in/veliogluriza">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+      <a class="icon-link" href="https://scholar.google.com/citations?user=bEGGmqgAAAAJ">
+        <i class="fa-brands fa-google-scholar"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p style="font-size:12px;">
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a> and is adopted from <a
+              href="https://nerfies.github.io/">Nerfies</a>.
+            Please remember to remove the analytics code included in the header of the website which
+            you do not want on your website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
