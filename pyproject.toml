@@ -1,0 +1,73 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "tryoffdiff"
+version = "0.0.1"
+description = "The source code of the paper: \"TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models\""
+authors = [{name = "Riza Velioglu", email = "rvelioglu+gh@techfak.uni-bielefeld.de"}]
+maintainers = [{name = "Riza Velioglu", email = "rvelioglu+gh@techfak.uni-bielefeld.de"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["diffusion", "image-to-image", "I2I", "unet", "stable-diffusion", "virtual-try-on", "virtual-try-off", "fashion", "e-commerce"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+requires-python = "~=3.11"
+
+dependencies = [
+    "torch>=2.4.0",
+    "torchvision>=0.19.0",
+    "diffusers>=0.29.2",
+    "transformers>=4.37.2",
+    "sentencepiece>=0.2.0",
+    "matplotlib>=3.9.1",
+    "tqdm>=4.66.4",
+    "accelerate>=1.0.1",
+    "pillow>=10.4.0",
+    "tensorboard>=2.17.0",
+    "loguru>=0.7.2",
+    "pre-commit>=3.8.0",
+    "typer>=0.12.3",
+    "torchmetrics>=1.4.1",
+    "pyiqa>=0.1.13",
+    "dists-pytorch>=0.1",
+    "clean-fid>=0.1.35",
+]
+[project.optional-dependencies]
+dev = [
+    "CLIP @ git+https://github.com/openai/CLIP",
+    "clean-fid>=0.1.35",
+    "pyssim>=0.7",
+    "DISTS-pytorch>=0.1",
+]
+
+[project.urls]
+Homepage = "https://rizavelioglu.github.io/tryoffdiff"
+Repository = "https://github.com/rizavelioglu/tryoffdiff/"
+Issues = "https://github.com/rizavelioglu/tryoffdiff/issues/"
+
+[tool.ruff]
+line-length = 120  # Allow lines to be as long as 120.
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191", # indentation contains tabs
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tryoffdiff"]
+force-sort-within-sections = true
