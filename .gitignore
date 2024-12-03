@@ -8,3 +8,4 @@ vendor
 notebooks/
 .ipynb_checkpoints/
 models/
+tryoffdiff/
