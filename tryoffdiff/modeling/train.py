@@ -138,10 +138,15 @@ def train_tryoffdiff(config: TrainingConfig):
         logger.info(f"Resuming from checkpoint: {config.resume_from_checkpoint}")
         accelerator.load_state(config.resume_from_checkpoint)
 
-        # Extract epoch number and resume from next epoch
-        starting_epoch = int(Path(config.resume_from_checkpoint).stem.replace("epoch_", "")) + 1
-        logger.info(f"Starting from epoch {starting_epoch}")
-        global_step = starting_epoch * len(train_loader)
+        # Read epoch number from the saved metadata
+        epoch_file = os.path.join(config.resume_from_checkpoint, "epoch.txt")
+        if os.path.exists(epoch_file):
+            with open(epoch_file) as f:
+                starting_epoch = int(f.read().strip()) + 1
+            logger.info(f"Starting from epoch {starting_epoch}")
+            global_step = starting_epoch * len(train_loader)
+        else:
+            raise ValueError(f"Epoch metadata not found in {config.resume_from_checkpoint}")
 
     model.train()
 
@@ -190,9 +195,15 @@ def train_tryoffdiff(config: TrainingConfig):
 
         # Save checkpoint based on checkpoint_every_n_epochs
         if epoch % config.checkpoint_every_n_epochs == 0 and accelerator.is_main_process:
-            output_dir = os.path.join(config.output_dir, f"epoch_{epoch}")
-            accelerator.save_state(output_dir)
-            logger.info(f"Saved checkpoint for epoch {epoch}")
+            ckpt_dir = os.path.join(config.output_dir, "checkpoint")
+            accelerator.save_state(ckpt_dir)
+
+            # Save epoch metadata to track the current checkpoint
+            epoch_file = os.path.join(ckpt_dir, "epoch.txt")
+            with open(epoch_file, "w") as f:
+                f.write(str(epoch))
+
+            logger.info(f"Saved checkpoint for epoch {epoch} at {ckpt_dir}")
 
         # Save model and noise scheduler if saving conditions are met
         maybe_save_model(model, accelerator, noise_scheduler, epoch, config)

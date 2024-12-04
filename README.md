@@ -66,6 +66,32 @@ python tryoffdiff/dataset.py siglip-encode-vitonhd \
  ```
 
 #### Step 3: Train `TryOffDiff`
+
+- Option 1 (GPU-poor) - Train with a single GPU:
+
+Execute the following
+```bash
+python tryoffdiff/modeling/train.py tryoffdiff \
+ --save-dir "./models/" \
+ --data-dir "./data/vitonhd-enc-sd14/" \
+ --model-class-name "TryOffDiff" \
+ --mixed-precision "no" \
+ --learning-rate 0.0001 \
+ --train-batch-size 16 \
+ --num-epochs 1201 \
+ --save-model-epochs 100 \
+ --checkpoint-every-n-epochs 100
+```
+
+- Option 2 - Train with 4-GPUs on a single node (as done in the paper):
+
+First, configure `accelerate` accordingly:
+```bash
+accelerate config
+```
+> We did not use any of the tools like dynamo, DeepSpeed, FullyShardedDataParallel etc.
+
+Then, start training:
 ```bash
 accelerate launch --multi_gpu --num_processes=4 tryoffdiff/modeling/train.py tryoffdiff \
  --save-dir "./models/" \
@@ -196,7 +222,7 @@ If you find this repository useful in your research, please consider giving a st
 @article{velioglu2024tryoffdiff,
   title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
   author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
-  journal   = {arXiv},
+  journal   = {arXiv preprint arXiv:2411.18350},
   year      = {2024},
   note      = {\url{https://doi.org/nt3n}}
 }
