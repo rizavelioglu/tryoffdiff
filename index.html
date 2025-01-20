@@ -37,9 +37,20 @@
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
+
+  <!-- Required for rendering LaTeX equations -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+
 </head>
 <body>
-
 
 <section class="hero">
   <div class="hero-body">
@@ -207,6 +218,24 @@
 <!-- End Abstract & Video -->
 
 
+<!-- Model Architecture -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-4 has-text-centered">Model Architecture</h2>
+        <img src="static/images/model.png" alt="AI model architecture proposed in the paper"/>
+      <h4 class="is-centered has-text-centered has-text-justified">
+        <b>Overview of TryOffDiff.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
+        (SigLIP-B/16) extracts features, resulting in a $(1024\times768)$ map. These features are refined by the <i>Adapter</i> for the cross-attention layers, similar to IP-Adapter.
+        The adapted features, now of shape $(77\times768)$, are integrated into a <i>Denoising U-Net</i> (Stable Diffusion-v1.4) where they replace the text features in the cross-attention layers.
+        The output is then processed by the <i>VAE Decoder</i> of SD-v1.4, which decodes the latents into pixel space, producing the <i>Predicted Garment $\hat{G}$</i>.
+        The model is trained end-to-end using the Mean Squared Error (MSE) loss, following standard diffusion model training practices.
+      </h4>
+    </div>
+  </div>
+</section>
+<!-- Model Architecture -->
+
 <!-- Scale & Context -->
 <!--<section class="hero is-small">-->
 <!--  <div class="hero-body">-->
@@ -276,32 +305,23 @@
 <!-- BibTeX Citation -->
 
 
-<footer class="footer">
+<footer class="footer" style="padding: 1rem 0;">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link" href="https://rizavelioglu.github.io/">
-        <i class="fa-solid fa-house"></i>
-      </a>
-      <a class="icon-link" href="https://github.com/rizavelioglu">
-        <i class="fa-brands fa-github"></i>
-      </a>
-      <a class="icon-link" href="https://x.com/rizavelioglu">
-        <i class="fa-brands fa-square-x-twitter"></i>
-      </a>
-      <a class="icon-link" href="https://linkedin.com/in/veliogluriza">
-        <i class="fa-brands fa-linkedin"></i>
-      </a>
-      <a class="icon-link" href="https://scholar.google.com/citations?user=bEGGmqgAAAAJ">
-        <i class="fa-brands fa-google-scholar"></i>
-      </a>
+      <a class="icon-link" href="https://rizavelioglu.github.io/"><i class="fa-solid fa-house"></i></a>
+      <a class="icon-link" href="https://github.com/rizavelioglu"><i class="fa-brands fa-square-github"></i></a>
+      <a class="icon-link" href="https://x.com/rizavelioglu"><i class="fa-brands fa-square-x-twitter"></i></a>
+      <a class="icon-link" href="https://linkedin.com/in/veliogluriza"><i class="fa-brands fa-linkedin"></i></a>
+      <a class="icon-link" href="https://scholar.google.com/citations?user=bEGGmqgAAAAJ"><i class="ai ai-google-scholar-square"></i></a>
+      <a class="icon-link" href='https://clustrmaps.com/site/1c3xn'  title='Visit tracker'><img src='//clustrmaps.com/map_v2.png?cl=ffffff&w=50&t=n&d=qsAdtxX9f7sThV5zkXu92PDz7wIIoTf4PSMpfFkP9mE' style="vertical-align: middle;"/></a>
     </div>
     <div class="columns is-centered">
-      <div class="column is-8">
+      <div class="column is-10">
         <div class="content">
           <p style="font-size:12px;">
             This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
             Commons Attribution-ShareAlike 4.0 International License</a> and is adopted from <a href="https://nerfies.github.io/">Nerfies</a>.
-            <br>Please remember to remove the analytics code included in the header of the website which you do not want on your website.
+            <br>Please remember to remove the analytics code as well as the clustrmaps link before deploying your own website.
           </p>
         </div>
       </div>
