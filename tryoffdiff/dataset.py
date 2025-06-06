@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
+import shutil
 import zipfile
 
 from diffusers import AutoencoderKL
@@ -23,8 +24,13 @@ app = typer.Typer(pretty_exceptions_enable=False)
 def download_vitonhd(
     output_dir: str = typer.Option("./data/vitonhd", help="The directory where the dataset will be extracted."),
 ):
-    """Downloads the VITON-HD dataset from the official link and extracts specific folders to the specified directory."""
-    vitonhd_link = "https://www.dropbox.com/scl/fi/xu08cx3fxmiwpg32yotd7/zalando-hd-resized.zip?rlkey=ks83mdv2pvmrdl2oo2bmmn69w&e=2&dl=1"
+    """Downloads the VITON-HD dataset and extracts specific folders to the specified directory."""
+    urls = [
+        # Official link
+        "https://www.dropbox.com/scl/fi/xu08cx3fxmiwpg32yotd7/zalando-hd-resized.zip?rlkey=ks83mdv2pvmrdl2oo2bmmn69w&e=2&dl=1",
+        # Unofficial link
+        "https://www.kaggle.com/api/v1/datasets/download/marquis03/high-resolution-viton-zalando-dataset",
+    ]
     zip_filename = "zalando-hd-resized.zip"
 
     # Ensure the output directory exists
@@ -34,38 +40,55 @@ def download_vitonhd(
     # Specific folders to extract (other folders are not necessary for VTOFF)
     allowed_folders = {"test/cloth/", "test/image/", "train/cloth/", "train/image/"}
 
-    try:
-        # Download the dataset
-        logger.info("Downloading VITON-HD dataset from the official source (may take ~5 minutes)...")
-        response = requests.get(vitonhd_link, stream=True)
-        response.raise_for_status()  # Raise an error for HTTP codes other than 200
+    def is_valid_zip(zip_path):
+        try:
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                return zf.testzip() is None
+        except Exception:
+            return False
 
-        # Save the zip file
-        zip_path = output_path / zip_filename
-        with open(zip_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
-        logger.info(f"Downloaded dataset to {zip_path}")
+    for idx, url in enumerate(urls):
+        try:
+            logger.info(f"Attempting to download VITON-HD dataset from: {url}")
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
 
-        # Extract only specific folders
-        logger.info("Extracting specific folders from dataset...")
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            for file in zip_ref.namelist():
-                # Check if the file belongs to one of the allowed folders
-                if any(file.startswith(folder) for folder in allowed_folders):
-                    zip_ref.extract(file, output_path)
-        logger.info(f"Dataset extracted to {output_path}")
+            zip_path = output_path / zip_filename
+            with open(zip_path, "wb") as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            logger.info(f"Downloaded dataset to {zip_path}")
 
-        # Optionally, delete the zip file after extraction
-        zip_path.unlink()
-        logger.info("Temporary zip file removed.")
+            if not is_valid_zip(zip_path):
+                logger.error(f"Downloaded file from {url} is not a valid zip archive.")
+                zip_path.unlink(missing_ok=True)
+                if idx == len(urls) - 1:
+                    raise zipfile.BadZipFile("All download attempts failed.")
+                continue
 
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error occurred during download: {e}")
-    except zipfile.BadZipFile:
-        logger.error("Error: The downloaded file is not a valid zip archive.")
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
+            logger.info("Extracting specific folders from dataset...")
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                for file in zip_ref.namelist():
+                    if any(file.startswith(folder) for folder in allowed_folders):
+                        zip_ref.extract(file, output_path)
+            logger.info(f"Dataset extracted to {output_path}")
+
+            zip_path.unlink()
+            logger.info("Temporary zip file removed.")
+            break  # Success, exit loop
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error occurred during download from {url}: {e}")
+            if idx == len(urls) - 1:
+                logger.error("All download attempts failed.")
+        except zipfile.BadZipFile:
+            logger.error(f"Error: The downloaded file from {url} is not a valid zip archive.")
+            if idx == len(urls) - 1:
+                logger.error("All download attempts failed.")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            if idx == len(urls) - 1:
+                logger.error("All download attempts failed.")
 
 
 @app.command()
@@ -295,6 +318,68 @@ def siglip_encode_vitonhd(
                 future.result()
 
     logger.success(f"Dataset saved at: {output_dir.parent}.")
+
+
+@app.command()
+def restructure_dresscode_to_vitonhd(
+    zip_dir: str = typer.Option(..., help="Path to the DressCode dataset zip file."),
+    output_dir: str = typer.Option("./data/dresscode", help="The directory where the dataset will be saved."),
+):
+    """Extracts only images/ subfolders and txt files from DressCode.zip, then organizes paired images into VITON-HD-like structure."""
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    main_folders = ["dresses", "lower_body", "upper_body"]
+    images_subfolder = "images/"
+    pair_files = ["train_pairs.txt", "test_pairs_paired.txt"]
+    files_to_extract = []
+
+    # Step 1: Extract only images/ folders and pair files
+    with zipfile.ZipFile(zip_dir, "r") as zip_ref:
+        for member in zip_ref.namelist():
+            # Extract pair files
+            if any(member == pf for pf in pair_files):
+                files_to_extract.append(member)
+            # Extract images/ subfolders from each main folder
+            for folder in main_folders:
+                prefix = f"{folder}/{images_subfolder}"
+                if member.startswith(prefix) and not member.endswith("/"):
+                    files_to_extract.append(member)
+
+        for file in files_to_extract:
+            zip_ref.extract(file, output_path)
+
+    # Step 2: Organize paired images into VITON-HD-like structure
+    split_root = output_path.parent / (output_path.name + "-split")
+    for split in ["train", "test"]:
+        for subfolder in ["cloth", "image"]:
+            (split_root / split / subfolder).mkdir(parents=True, exist_ok=True)
+
+    # Read pairs
+    category_mapping = {"0": "upper_body", "1": "lower_body", "2": "dresses"}
+
+    def read_pairs(file_path):
+        with open(file_path) as f:
+            return [line.strip().split("\t") for line in f.readlines()]
+
+    train_pairs = read_pairs(output_path / "train_pairs.txt")
+    test_pairs = read_pairs(output_path / "test_pairs_paired.txt")
+
+    def copy_images(pairs, dest_dir):
+        for model_img, garment_img, c in pairs:
+            category_folder = category_mapping.get(c)
+            for idx, img in enumerate([model_img, garment_img]):
+                src_path = output_path / category_folder / "images" / img
+                dst_folder = "image" if idx == 0 else "cloth"
+                dst_path = split_root / dest_dir / dst_folder / img
+                if src_path.exists():
+                    shutil.copy2(src_path, dst_path)
+                    logger.info(f"Copied {src_path} -> {dst_path}")
+
+    copy_images(train_pairs, "train")
+    copy_images(test_pairs, "test")
+
+    logger.success(f"DressCode dataset restructured at: {split_root}")
 
 
 if __name__ == "__main__":
