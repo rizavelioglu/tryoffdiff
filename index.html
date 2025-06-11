@@ -57,6 +57,9 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
+          <p class="is-size-6 has-text-grey">
+            <a href="https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20" target="_blank" rel="noopener noreferrer">[CVPR'25-Demo]</a>
+          </p>
           <h1 class="title is-1 publication-title">TryOffDiff: <br>Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
@@ -76,23 +79,23 @@
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- PDF Link. -->
-              <span class="link-block">
-                <a href="https://arxiv.org/pdf/2411.18350"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
+              <!-- arXiv Link. -->
               <span class="link-block">
                 <a href="https://arxiv.org/abs/2411.18350"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="ai ai-arxiv"></i>
                   </span>
-                  <span>arXiv</span>
+                  <span>Paper#1</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2504.13078"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper#2</span>
                 </a>
               </span>
               <!-- Video Link. -->
@@ -150,17 +153,66 @@
   </div>
 </section>
 
-
-<section class="section">
-  <div class="columns is-centered has-text-centered">
-    <h2 class="title is-3">...Stay tuned...</h2>
+<!-- VTOFF image -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-4 has-text-centered">Problem Statement</h2>
+      <div class="columns is-vcentered">
+        <!-- Image Column -->
+        <div class="column is-one-third has-text-centered">
+          <img src="static/images/TryOn-TryOff.png" alt="Illustration of the relationship between Virtual Try-On and Virtual Try-Off." style="max-width: 100%; height: auto;">
+        </div>
+        <!-- Text Column -->
+        <div class="column">
+          <h4 class="has-text-justified">
+            <b>Illustration of the relationship between Virtual Try-On (VTON) and Virtual Try-Off (VTOFF).</b><br>
+            Left: VTON focuses on transferring garments onto a person.
+            Right: VTOFF aims to reconstruct the garment itself from a worn instance.
+            These two tasks are inherently cyclic: the output of one can serve as the input to the other.<br>
+            This cyclical connection offers: (1) improved training through consistency constraints in the loss function [54],
+            (2) the generation of synthetic data for both tasks [9, 40].
+            Such synergy not only enhances model robustness but also opens new possibilities in fashion image generation.
+            Despite the growing interest in VTON, its inverse task, VTOFF, has received limited attention and remains
+            largely undefined in the literature. Furthermore, current VTON methods often assume the availability of
+            clean product images. Eliminating this dependency reduces the need for expensive photography and manual
+            editing, thereby enabling smaller vendors to produce professional-quality visuals more affordably.
+          </h4>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+<!-- VTOFF image -->
+
+
+<!-- Model Architecture -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-4 has-text-centered">Method</h2>
+        <img src="static/images/model.png" alt="AI model architecture proposed in the paper"/>
+      <h4 class="is-centered has-text-centered has-text-justified">
+        <b>Overview of TryOffDiff.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
+        (SigLIP-B/16) extracts features, resulting in a $(1024\times768)$ map. These features are refined by the <i>Adapter</i>, following IP-Adapter, to align with the cross-attention mechanism.
+        The adapted features, now of shape $(77\times768)$, are injected into the <i>Denoising U-Net</i> of Stable Diffusion-v1.4 by replacing the default text features in the cross-attention layers.
+        A class label $c \in \{\text{"upper-body"},\ \text{"lower-body"},\ \text{"dresses"}\}$ is mapped to a learnable embedding and added to the timestep embeddings of the diffusion model, conditioning the generation process on garment type.
+        The final latent output is decoded into pixel space by the <i>VAE Decoder</i> of SD-v1.4, yielding the reconstructed garment image $\hat{G}$.
+        <br>
+        We train four separate models: one each for upper-body, lower-body, and dresses, along with a multi-garment model that handles all classes.
+        All models are trained end-to-end using Mean Squared Error (MSE) loss, adhering to standard diffusion model training procedures.
+      </h4>
+    </div>
+  </div>
+</section>
+<!-- Model Architecture -->
+
 
 <!-- Image carousel -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
+      <h2 class="title is-4 has-text-centered">Results</h2>
       <div id="teaser-carousel" class="carousel teaser-carousel">
         <div class="item"><img src="static/images/whole_test_1.jpg" alt="Bounding box predictions on a shoe product image."/></div>
         <div class="item"><img src="static/images/whole_test_2.jpg" alt="Bounding box predictions on a bag product image."/></div>
@@ -175,120 +227,6 @@
 <!-- End image carousel -->
 
 
-<!-- Abstract & Video -->
-<section class="section">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            This paper introduces <i>Virtual Try-Off</i> (<b>VTOFF</b>), a novel task focused on generating standardized garment
-            images from single photos of clothed individuals. Unlike traditional Virtual Try-On (VTON), which digitally
-            dresses models, VTOFF aims to extract a canonical garment image, posing unique challenges in capturing
-            garment shape, texture, and intricate patterns. This well-defined target makes VTOFF particularly effective
-            for evaluating reconstruction fidelity in generative models. We present <i>TryOffDiff</i>, a model that adapts
-            Stable Diffusion with SigLIP-based visual conditioning to ensure high fidelity and detail retention.
-            Experiments on a modified VITON-HD dataset show that our approach outperforms baseline methods based on
-            pose transfer and virtual try-on with fewer pre- and post-processing steps. Our analysis reveals that
-            traditional image generation metrics inadequately assess reconstruction quality, prompting us to rely on
-            DISTS for more accurate evaluation. Our results highlight the potential of VTOFF to enhance product imagery
-            in e-commerce applications, advance generative model evaluation, and inspire future work on high-fidelity
-            reconstruction.
-          </p>
-        </div>
-      </div>
-    </div>
-    <!--/ Abstract. -->
-
-    <!-- Paper video. -->
-<!--    <div class="columns is-centered has-text-centered">-->
-<!--      <div class="column is-four-fifths">-->
-<!--        <h2 class="title is-3">Video</h2>-->
-<!--        <div class="publication-video">-->
-<!--          <iframe src="https://www.youtube.com/embed/..."-->
-<!--                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-    <!--/ Paper video. -->
-  </div>
-</section>
-<!-- End Abstract & Video -->
-
-
-<!-- Model Architecture -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <h2 class="title is-4 has-text-centered">Model Architecture</h2>
-        <img src="static/images/model.png" alt="AI model architecture proposed in the paper"/>
-      <h4 class="is-centered has-text-centered has-text-justified">
-        <b>Overview of TryOffDiff.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
-        (SigLIP-B/16) extracts features, resulting in a $(1024\times768)$ map. These features are refined by the <i>Adapter</i> for the cross-attention layers, similar to IP-Adapter.
-        The adapted features, now of shape $(77\times768)$, are integrated into a <i>Denoising U-Net</i> (Stable Diffusion-v1.4) where they replace the text features in the cross-attention layers.
-        The output is then processed by the <i>VAE Decoder</i> of SD-v1.4, which decodes the latents into pixel space, producing the <i>Predicted Garment $\hat{G}$</i>.
-        The model is trained end-to-end using the Mean Squared Error (MSE) loss, following standard diffusion model training practices.
-      </h4>
-    </div>
-  </div>
-</section>
-<!-- Model Architecture -->
-
-<!-- Scale & Context -->
-<!--<section class="hero is-small">-->
-<!--  <div class="hero-body">-->
-<!--    <div class="container is-max-desktop">-->
-<!--      <h2 class="title is-4 has-text-centered">Scale</h2>-->
-<!--      <p>-->
-<!--        lorem ipsum-->
-<!--      </p>-->
-<!--      <div class="carousel scale-carousel">-->
-<!--        <div class="item"><img src="static/images/scale-zarashoe.jpg" alt=""/></div>-->
-<!--        <div class="item"><img src="static/images/scale-glasses.jpg" alt=""/></div>-->
-<!--        <div class="item"><img src="static/images/scale-adishoe.jpg" alt=""/></div>-->
-<!--      </div>-->
-<!--      <br>-->
-<!--      <h2 class="title is-4 has-text-centered">Context</h2>-->
-<!--      <p>-->
-<!--        lorem ipsum-->
-<!--      </p>-->
-<!--      <br>-->
-<!--      <img src="static/images/context-watch.jpg" alt="MY ALT TEXT"/>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</section>-->
-<!-- Scale & Context -->
-
-
-<!-- Results -->
-<!--<section class="section">-->
-<!--  <div class="container is-max-desktop">-->
-<!--    <h2 class="title is-3 has-text-centered">Results</h2>-->
-<!--      <p>-->
-<!--        lorem ipsum-->
-<!--      </p>-->
-<!--    <br>-->
-<!--      <div class="carousel teaser-carousel">-->
-<!--        <div class="item"><img src="static/images/preds-glasses.jpg" alt=""/></div>-->
-<!--        <div class="item"><img src="static/images/preds-shoe_1.jpg" alt=""/></div>-->
-<!--      </div>-->
-<!--    <p>-->
-<!--      <br>-->
-<!--      lorem ipsum-->
-<!--    </p>-->
-<!--    <br>-->
-<!--    <div class="carousel teaser-carousel">-->
-<!--      <div class="item"><img src="static/images/preds-multi0.jpg" alt=""/></div>-->
-<!--      <div class="item"><img src="static/images/preds-multi1.jpg" alt=""/></div>-->
-<!--      <div class="item"><img src="static/images/preds-multi2.jpg" alt=""/></div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</section>-->
-<!-- Results -->
-
-
 <!-- BibTeX Citation -->
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
@@ -296,9 +234,16 @@
     <pre><code>@article{velioglu2024tryoffdiff,
     title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
     author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
-    journal   = {arXiv},
+    journal   = {arXiv preprint arXiv:2411.18350},
     year      = {2024},
     note      = {\url{https://doi.org/nt3n}}
+}
+@article{velioglu2025enhancing,
+    title     = {Enhancing Person-to-Person Virtual Try-On with Multi-Garment Virtual Try-Off},
+    author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
+    journal   = {arXiv preprint arXiv:2504.13078},
+    year      = {2025},
+    note      = {\url{https://doi.org/pn67}}
 }</code></pre>
   </div>
 </section>
