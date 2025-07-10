@@ -16,10 +16,11 @@ The official repository of the papers:
 ---
 
 ### 🎉 News
+- [2025-07-10]: Code for new features made available.
+- [2025-04-17]: Paper2 (follow-up work) appeared on arXiv with improvements, _e.g._ multi-garment try-off.
+- [2025-03-26]: Demo is accepted at [CVPR'25 Demo Track](https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20&zoom=180), presented on June 13, 2025.
 - [2024-12-03]: Training, Inference, and Evaluation scripts made available.
-- [2025-03-26]: Demo is accepted at [CVPR'25 Demo Track](https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20&zoom=180), will be presented on June 13, 2025.
-- [2025-04-17]: Follow-up paper is released with improvements, _e.g._ multi-garment try-off.
-- [2025-06-xx]: Code for new features made available.
+- [2024-11-27]: Paper1 appeared on arXiv.
 
 ---
 
@@ -48,8 +49,8 @@ The following project/directory structure is adopted: [Cookiecutter Data Science
     │   └── train.py     <- Code to train models
     |
     ├── __init__.py      <- Makes `tryoffdiff` a Python module
-    ├── config.py        <- Store configuration variables
-    ├── dataset.py       <- Download and clean VITON-HD dataset
+    ├── config.py        <- Store configuration variables for training and inference
+    ├── dataset.py       <- Download and clean datasets VITON-HD & Dress Code
     ├── features.py      <- Code to create features for modeling
     └── plots.py         <- Code to create visualizations
 ```

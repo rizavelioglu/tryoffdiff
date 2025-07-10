@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "tryoffdiff"
-version = "0.0.1"
+version = "0.0.2"
 description = "The source code of the paper: \"TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models\""
 authors = [{name = "Riza Velioglu", email = "rvelioglu+gh@techfak.uni-bielefeld.de"}]
 maintainers = [{name = "Riza Velioglu", email = "rvelioglu+gh@techfak.uni-bielefeld.de"}]
@@ -17,30 +17,21 @@ classifiers = [
 requires-python = "~=3.11"
 
 dependencies = [
-    "torch>=2.4.0",
-    "torchvision>=0.19.0",
-    "diffusers>=0.29.2",
-    "transformers>=4.37.2",
+    "torch>=2.7.1",
+    "diffusers>=0.34.0",
+    "transformers>=4.53.1",
     "sentencepiece>=0.2.0",
     "matplotlib>=3.9.1",
-    "tqdm>=4.66.4",
-    "accelerate>=1.0.1",
-    "pillow>=10.4.0",
-    "tensorboard>=2.17.0",
-    "loguru>=0.7.2",
-    "pre-commit>=3.8.0",
-    "typer>=0.12.3",
-    "torchmetrics>=1.4.1",
-    "pyiqa>=0.1.13",
+    "tqdm>=4.67.1",
+    "accelerate>=1.8.1",
+    "pillow>=11.3.0",
+    "tensorboard>=2.19.0",
+    "loguru>=0.7.3",
+    "pre-commit>=4.2.0",
+    "typer>=0.15.1",
+    "torchmetrics>=1.7.4",
     "dists-pytorch>=0.1",
     "clean-fid>=0.1.35",
-]
-[project.optional-dependencies]
-dev = [
-    "CLIP @ git+https://github.com/openai/CLIP",
-    "clean-fid>=0.1.35",
-    "pyssim>=0.7",
-    "DISTS-pytorch>=0.1",
 ]
 
 [project.urls]

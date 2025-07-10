@@ -98,26 +98,20 @@ python tryoffdiff/modeling/train.py tryoffdiffv2 \
 
 
 ### Inference
-Each model has its own command. View all available options:
+To run inference with a trained model (regardless of its model class, i.e. `TryOffDiffv2Single` or `TryOffDiffv2Multi`),
+ simply use the following command:
+
 ```bash
-python tryoffdiff/modeling/predict.py --help
+python tryoffdiff/modeling/predict.py tryoffdiffv2 \
+  --model-dir "/model_20250710_123456/" \
+  --model-filename "model_epoch_200.pth" \
+  --batch-size 8  \
+  --num-inference-steps 20 \
+  --seed 42 \
+  --guidance-scale 2.5
 ```
 
-> **_Example_**: Run inference with `TryOffDiffv2Single`:
-```bash
-python tryoffdiff/modeling/predict.py tryoffdiff \
-  --model-dir "/model_20241007_154516/" \
-  --model-filename "model_epoch_200.pth" \
-  --batch-size 8 \
-  --num-inference-steps 50 \
-  --seed 42 \
-  --guidance-scale 2.0
-> ```
-which saves predictions to `"<model-dir>/preds/"` as `.png` files.
-
-> **Note**: See [config.py(InferenceConfig)](tryoffdiff/config.py) for all possible arguments,
-e.g. use the `--all` flag to run inference on the entire test set.
-
+which runs inference on the entire test set and  saves predictions to `"<model-dir>/preds/"` as `.png` files.
 
 ### Evaluation
 

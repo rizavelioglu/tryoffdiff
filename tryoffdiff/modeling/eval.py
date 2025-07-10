@@ -1,10 +1,20 @@
 from glob import glob
 import os
+import subprocess
+import sys
 
 from cleanfid import fid
 from DISTS_pytorch import DISTS
 import numpy as np
-import pyiqa
+
+# pyiqa requires older version of packages, causing dependency issues during install. Therefore, we install it here.
+# Specifically, it requires accelerate=1.1.0 and transformers=4.37.2.
+try:
+    import pyiqa
+except ImportError:
+    print("pyiqa not found. Installing...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyiqa==0.1.14.1", "--no-deps"])
+    import pyiqa
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision.io import read_image
@@ -15,7 +25,7 @@ import typer
 app = typer.Typer(pretty_exceptions_enable=False)
 
 
-class VitonhdEvalDataset(Dataset):
+class ImageDataset(Dataset):
     def __init__(self, gt_dir: str, pred_dir: str, resize_to: tuple[int, int] = (1024, 768)):
         typer.secho(f"Predictions dir: {pred_dir}.", fg=typer.colors.BRIGHT_BLUE)
 
@@ -25,12 +35,18 @@ class VitonhdEvalDataset(Dataset):
             typer.confirm("Do you want to continue despite the mismatch?", abort=True)
 
         self.pred_files = sorted(glob(f"{pred_dir}/*.[jp][pn]g"))  # allow both jpg and png
-        self.gt_files = [os.path.join(gt_dir, os.path.basename(f).replace(".png", ".jpg")) for f in self.pred_files]
+        self.gt_files = [
+            os.path.join(
+                gt_dir,
+                os.path.basename(f).replace(".png", ".jpg").replace("_0", "_1")
+                if "dresscode" in gt_dir
+                else os.path.basename(f).replace(".png", ".jpg"),
+            )
+            for f in self.pred_files
+        ]
 
-        # Initialize and set transforms
-        self.gt_transform = None
-        self.pred_transform = None
-        self.set_transforms(resize_to)
+        # Create transforms based on the first predicted image dimensions
+        self.gt_transform, self.pred_transform = self._create_transforms(resize_to)
 
     def __len__(self):
         return len(self.gt_files)
@@ -40,18 +56,22 @@ class VitonhdEvalDataset(Dataset):
         pred = self.pred_transform(read_image(self.pred_files[idx]))
         return gt, pred
 
-    def set_transforms(self, resize_to):
+    def _create_transforms(self, resize_to):
+        """Create and return gt and pred transforms based on resize dimensions."""
         # Get dimensions from the first predicted image
         h, w = read_image(self.pred_files[0]).shape[1:]
 
         # Define transform for ground-truth images
         self.gt_transform = transforms.Compose(
-            [transforms.ToDtype(dtype=torch.float32, scale=True), transforms.Resize(resize_to)]
+            [
+                transforms.ToDtype(dtype=torch.float32, scale=True),
+                transforms.Resize(resize_to),
+            ]
         )
 
         # Define transform for predicted images based on their original dimensions
         if resize_to == (1024, 768):
-            if (h, w) in [(256, 256), (256, 176)]:
+            if (h, w) in [(256, 256), (256, 176), (512, 384)]:
                 typer.secho(f"Resizing predictions ({h}x{w}) to 1024x768.", fg=typer.colors.YELLOW)
                 self.pred_transform = transforms.Compose(
                     [
@@ -85,41 +105,40 @@ class VitonhdEvalDataset(Dataset):
 
         # Required for DISTS metric, which uses VGG16 that expects inputs in (224x224).
         elif resize_to == (341, 256):
-            if (h, w) in [(256, 256), (256, 176)]:
+            if (h, w) in [(256, 256), (256, 176), (512, 384)]:
                 typer.secho(f"Resizing predictions ({h}x{w}) to 341x256.", fg=typer.colors.YELLOW)
                 self.pred_transform = transforms.Compose(
                     [
-                        transforms.ToDtype(dtype=torch.float32, scale=True),
                         transforms.Resize(resize_to),
+                        transforms.ToDtype(dtype=torch.float32, scale=True),
                     ]
                 )
-            elif (h, w) in [(512, 512), (128, 128)]:
+            elif (h, w) == (512, 512):
                 typer.secho(
-                    f"Resizing predictions ({h}x{w}) to 1024x1024 and cropping to 341x256.", fg=typer.colors.YELLOW
+                    f"Cropping predictions ({h}x{w}) to 512x384 and resizing to 341x256.", fg=typer.colors.YELLOW
                 )
                 self.pred_transform = transforms.Compose(
                     [
-                        transforms.ToDtype(dtype=torch.float32, scale=True),
-                        transforms.Resize((1024, 1024)),
-                        transforms.CenterCrop((1024, 768)),
+                        transforms.CenterCrop((512, 384)),
                         transforms.Resize(resize_to),
+                        transforms.ToDtype(dtype=torch.float32, scale=True),
                     ]
                 )
             elif (h, w) == (1024, 1024):
                 typer.secho(f"Cropping predictions ({h}x{w}) to 341x256.", fg=typer.colors.YELLOW)
                 self.pred_transform = transforms.Compose(
                     [
-                        transforms.ToDtype(dtype=torch.float32, scale=True),
                         transforms.CenterCrop((1024, 768)),
                         transforms.Resize(resize_to),
+                        transforms.ToDtype(dtype=torch.float32, scale=True),
                     ]
                 )
             elif (h, w) == (1024, 768):
                 typer.secho(f"Resizing predictions ({h}x{w}) to 341x256.", fg=typer.colors.YELLOW)
                 self.pred_transform = transforms.Compose(
                     [
-                        transforms.ToDtype(dtype=torch.float32, scale=True),
                         transforms.Resize(resize_to),
+                        transforms.ToDtype(dtype=torch.float32, scale=True),
                     ]
                 )
             else:
@@ -127,6 +146,8 @@ class VitonhdEvalDataset(Dataset):
 
         else:
             raise ValueError(f"Unsupported resize dimensions: {resize_to}")
+
+        return self.gt_transform, self.pred_transform
 
 
 def check_directory_contents(gt_dir: str, pred_dir: str) -> bool:
@@ -228,7 +249,7 @@ def compute_dists(gt_dir: str, pred_dir: str, batch_size: int, num_workers: int)
     metric_names = ["\u2193 DISTS"]
     metric = DISTS().to(device)
 
-    dataset = VitonhdEvalDataset(gt_dir, pred_dir, resize_to=(341, 256))
+    dataset = ImageDataset(gt_dir, pred_dir, resize_to=(341, 256))
     dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, pin_memory=True, shuffle=False)
 
     metric_values = []
@@ -257,7 +278,7 @@ def main(
     evaluator = PYIQAEvaluator()
 
     # Initialize dataloader
-    dataset = VitonhdEvalDataset(gt_dir, pred_dir)
+    dataset = ImageDataset(gt_dir, pred_dir)
     dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, pin_memory=True, shuffle=False)
 
     # Accumulate metrics across all batches
