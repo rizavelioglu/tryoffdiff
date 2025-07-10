@@ -1,8 +1,8 @@
-from dataclasses import dataclass, field, is_dataclass
-from datetime import datetime
 import inspect
 import json
 import os
+from dataclasses import dataclass, field, is_dataclass
+from datetime import datetime
 from pathlib import Path
 
 import typer
@@ -64,30 +64,28 @@ def load_training_config(model_dir: str) -> dict:
 
 @dataclass
 class TrainingConfig:
-    save_dir: str = typer.Option(..., help="Directory to save model checkpoints and logs.")
-    data_dir: str = typer.Option(..., help="Directory containing the dataset.")
-    model_class_name: str = typer.Option(..., help="Model class name to instantiate.")
-    train_batch_size: int = typer.Option(16, help="Batch size for training.")
-    num_epochs: int = typer.Option(500, help="Number of training epochs")
-    start_model: str = typer.Option(None, help="Path to a pre-trained model to start from.")
-    gradient_accumulation_steps: int = typer.Option(
-        1, help="Number of updates steps to accumulate before performing a backward/update pass."
-    )
-    learning_rate: float = typer.Option(1e-4, help="Learning rate for the optimizer.")
-    lr_warmup_steps: int = typer.Option(
-        1000, help="Number of steps for the warmup phase of the learning rate scheduler."
-    )
-    save_model_epochs: int = typer.Option(50, help="Save model checkpoint every n epochs.")
-    mixed_precision: str = typer.Option("fp16", help="Mixed precision mode, e.g., 'fp16' or 'no'")
-    logger: str = typer.Option("tensorboard", help="Logging backend to use.")
-    device: str = typer.Option("cuda", help="Device to use for training. Options are 'cuda' or 'cpu'.")
-    checkpoint_every_n_epochs: int = typer.Option(50, help="Number of epochs between checkpoint saving.")
-    resume_from_checkpoint: str = typer.Option("", help="Path to checkpoint directory.")
+    save_dir: str                    = typer.Option(...,           help="Directory to save model checkpoints and logs.")
+    data_dir: str                    = typer.Option(...,           help="Directory containing the dataset.")
+    model_class_name: str            = typer.Option(...,           help="Model class name to instantiate.")
+    dataset_type: str                = typer.Option("mask",        help="Conditioning clothing image type: 'original' (raw sample) or 'mask' (masked).")
+    train_batch_size: int            = typer.Option(16,            help="Batch size for training.")
+    eval_batch_size: int             = typer.Option(16,            help="Batch size for evaluation.")
+    num_epochs: int                  = typer.Option(500,           help="Number of training epochs")
+    start_model: str                 = typer.Option(None,          help="Path to a pre-trained model to start from.")
+    gradient_accumulation_steps: int = typer.Option(1,             help="Number of updates steps to accumulate before performing a backward/update pass.")
+    learning_rate: float             = typer.Option(1e-4,          help="Learning rate for the optimizer.")
+    save_image_epochs: int           = typer.Option(50,            help="Save generated images every n epochs.")
+    save_model_epochs: int           = typer.Option(50,            help="Save model checkpoint every n epochs.")
+    mixed_precision: str             = typer.Option("fp16",        help="Mixed precision mode, e.g., 'fp16' or 'no'")
+    logger: str                      = typer.Option("tensorboard", help="Logging backend to use.")
+    device: str                      = typer.Option("cuda",        help="Device to use for training. Options are 'cuda' or 'cpu'.")
+    checkpoint_every_n_epochs: int   = typer.Option(50,            help="Number of epochs between checkpoint saving.")
+    resume_from_checkpoint: str      = typer.Option("",            help="Path to checkpoint directory.")
 
     train_img_dir: Path = field(init=False)
-    val_img_dir: Path = field(init=False)
-    log_dir: Path = field(init=False)
-    model_id: str = field(init=False)
+    val_img_dir: Path   = field(init=False)
+    log_dir: Path       = field(init=False)
+    model_id: str       = field(init=False)
     output_dir: Path = field(init=False)
 
     def __post_init__(self):
@@ -98,48 +96,47 @@ class TrainingConfig:
         It sets up the directory structure and generates a unique model identifier.
         """
         self.train_img_dir = Path(self.data_dir) / "train/"
-        self.val_img_dir = Path(self.data_dir) / "test/"
-        self.log_dir = Path(self.save_dir) / "logs/"
-        self.model_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.val_img_dir   = Path(self.data_dir) / "test/"
+        self.log_dir       = Path(self.save_dir) / "logs/"
+        self.model_id      = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.output_dir = Path(self.save_dir) / f"model_{self.model_id}/"
         typer.secho(message=f"ModelID:{self.model_id}", fg=typer.colors.YELLOW)
 
 
 @dataclass
 class InferenceConfig:
-    model_dir: str = typer.Option(..., help="Directory containing the saved model")
-    model_filename: str = typer.Option(..., help="Filename of the model, e.g. 'model_epoch_100.pth'")
-    batch_size: int = typer.Option(..., help="Batch size for inference")
-    num_inference_steps: int = typer.Option(..., help="Number of denoising steps.")
-    device: str = typer.Option("cuda", help="Device to run the inference on, e.g., 'cuda' or 'cpu'")
-    seed: int = typer.Option(42, help="Seed for random number generation")
-    guidance_scale: float = typer.Option(None, help="")
-    vis_intermediate_steps: bool = typer.Option(False, "-v", help="When provided, plots 10 intermediate results.")
-    vis_with_caption: bool = typer.Option(False, "-c", help="When provided, adds caption to figures.")
-    process_all_samples: bool = typer.Option(
-        False, "--all", help="When provided, inference is run for all test samples."
-    )
+    model_dir: str               = typer.Option(...,            help="Directory containing the saved model")
+    model_filename: str          = typer.Option(...,            help="Filename of the model, e.g. 'model_epoch_100.pth'")
+    batch_size: int              = typer.Option(...,            help="Batch size for inference")
+    num_inference_steps: int     = typer.Option(...,            help="Number of denoising steps.")
+    device: str                  = typer.Option("cuda",         help="Device to run the inference on, e.g., 'cuda' or 'cpu'")
+    seed: int                    = typer.Option(42,             help="Seed for random number generation")
+    guidance_scale: float        = typer.Option(None,           help="")
+    vis_intermediate_steps: bool = typer.Option(False, "-v",    help="When provided, plots 10 intermediate results.")
+    upscale_latents: bool        = typer.Option(False, "--u",   help="When provided, upscales model output (predicted latents) by 2x.")
 
-    output_dir: Path = field(init=False)
-    model_path: Path = field(init=False)
-    scheduler_dir: Path = field(init=False)
+    output_dir: Path     = field(init=False)
+    scheduler_dir: Path  = field(init=False)
+    model_path: Path     = field(init=False)
 
     # Fields populated from training config
-    data_dir: Path = field(init=False)
-    train_img_dir: Path = field(init=False)
-    val_img_dir: Path = field(init=False)
+    data_dir: Path       = field(init=False)
+    train_img_dir: Path  = field(init=False)
+    val_img_dir: Path    = field(init=False)
     mixed_precision: str = field(init=False)
-    model_class: str = field(init=False)
+    model_class: str     = field(init=False)
+    dataset_type: str    = field(init=False)
 
     def __post_init__(self):
-        self.output_dir = Path(self.model_dir) / "preds/"
-        self.model_path = Path(self.model_dir) / self.model_filename
+        self.output_dir    = Path(self.model_dir) / "preds/"
         self.scheduler_dir = Path(self.model_dir) / "scheduler/"
+        self.model_path    = Path(self.model_dir) / self.model_filename
 
         # Load common args from the training config
-        train_cfg = load_training_config(self.model_dir)
-        self.data_dir = Path(train_cfg["data_dir"])
-        self.train_img_dir = Path(train_cfg["train_img_dir"])
-        self.val_img_dir = Path(train_cfg["val_img_dir"])
+        train_cfg            = load_training_config(self.model_dir)
+        self.data_dir        = Path(train_cfg["data_dir"])
+        self.train_img_dir   = Path(train_cfg["train_img_dir"])
+        self.val_img_dir     = Path(train_cfg["val_img_dir"])
         self.mixed_precision = train_cfg["mixed_precision"]
-        self.model_class = train_cfg["model_class_name"]
+        self.model_class     = train_cfg["model_class_name"]
+        self.dataset_type    = train_cfg["dataset_type"]
