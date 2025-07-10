@@ -167,78 +167,78 @@ def create_transform(model_name: str) -> transforms.Compose:
     return name_to_transform.get(model_name)
 
 
-@app.command()
-def vae_encode_vitonhd(
-    data_dir: str = typer.Option(..., help="Path to the VITONHD dataset directory."),
-    model_name: str = typer.Option("sd14", help="Abbreviation of the VAE model: ['sd14', 'sdxl', 'sd3']."),
-    batch_size: int = typer.Option(default=16),
-):
-    """Encode images using VAE for the VITON-HD dataset and save them using safetensors.
+class CustomDataset(Dataset):
+    def __init__(self, root_dir: Path, transform: transforms.Compose, folder: str):
+        """Initialize the dataset.
 
-    This concatenates VAE encodings of both clothing and model images into a single file.
+        Args:
+            root_dir: Path to the dataset split directory (e.g., train or test)
+            transform: Transforms to apply to the images
+            folder: Which folder to load images from ('cloth' or 'image')
+        """
+        self.img_dir = root_dir / folder
+        self.image_filenames = [i.name for i in os.scandir(self.img_dir) if i.is_file()]
+        self.transform = transform
+
+    def __len__(self) -> int:
+        return len(self.image_filenames)
+
+    def __getitem__(self, idx: int):
+        image_filename = self.image_filenames[idx]
+        img = read_image(str(self.img_dir / image_filename))
+        return self.transform(img), image_filename
+
+
+@app.command()
+def vae_encode_dataset(
+    data_dir: str = typer.Option(..., help="Path to the dataset directory."),
+    model_name: str = typer.Option("sd14", help="Abbreviation of the VAE model: ['sd14', 'sdxl', 'sd3']."),
+    batch_size: int = typer.Option(default=8),
+    data_name: str = typer.Option(..., help="Name of the dataset: ['vitonhd', 'dresscode']."),
+):
+    """Encode images using VAE for the specified dataset and save them using safetensors.
 
     Examples:
-        $ python tryoffdiff/dataset.py vae-encode-vitonhd \
-        --data-dir "<path-to-data-dir>" \
+        Encoding the Dresscode dataset using the SD3-VAE model:
+        $ python tryoffdiff/dataset.py vae-encode-dataset \
+        --data-dir ".../dresscode/" \
         --model-name "sd3" \
-        --batch-size 4
+        --batch-size 32 \
+        --data-name "dresscode"
+
+        Encoding the VITON-HD dataset using the SD1.4-VAE model:
+        $ python tryoffdiff/dataset.py vae-encode-dataset \
+        --data-dir ".../vitonhd/" \
+        --model-name "sd14" \
+        --batch-size 32 \
+        --data-name "vitonhd"
     """
 
-    class CustomVitonDataset(Dataset):
-        def __init__(self, root_dir: Path, transform: transforms.Compose):
-            self.cloth_dir = root_dir / "cloth"
-            self.cond_dir = root_dir / "image"
-            self.image_filenames = [i.name for i in os.scandir(self.cloth_dir) if i.is_file()]
-            self.transform = transform
-
-        def __len__(self) -> int:
-            return len(self.image_filenames)
-
-        def __getitem__(self, idx: int):
-            image_filename = self.image_filenames[idx]
-            cond_path = self.cond_dir / image_filename
-            cloth_path = self.cloth_dir / image_filename
-
-            cond_img = read_image(str(cond_path))
-            cloth_img = read_image(str(cloth_path))
-
-            return self.transform(cloth_img), self.transform(cond_img), image_filename
-
     device = "cuda"
-    vae_scale_factor = 0.18215
     vae = load_vae_model(model_name, device)
 
     for split in ["train", "test"]:
         input_dir = Path(data_dir) / split
-        output_dir = Path(data_dir).parent / f"vitonhd-enc-{model_name}" / split
+        output_dir = Path(data_dir).parent / f"{data_name}-enc-{model_name}" / split
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        dataset = CustomVitonDataset(root_dir=input_dir, transform=create_transform(model_name))
+        dataset = CustomDataset(root_dir=input_dir, transform=create_transform(model_name), folder="cloth")
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
-        total_batches = len(dataloader)
 
         with (
-            tqdm(total=total_batches, desc=f"Encoding {split}", unit="batch") as pbar,
+            tqdm(total=len(dataloader), desc=f"Encoding {split}", unit="batch") as pbar,
             ThreadPoolExecutor(max_workers=4) as executor,
         ):
             futures = []
             for batch in dataloader:
-                x, cond, img_names = batch
-                x, cond = x.to(device), cond.to(device)
+                x, img_names = batch
+                x = x.to(device)
 
                 with torch.no_grad():
-                    latent_x = vae.encode(x).latent_dist.sample() * vae_scale_factor
+                    latents = vae.encode(x).latent_dist.sample() * vae.config.scaling_factor
+                    latents = latents.cpu()
 
-                    if model_name == "sd3":
-                        latent_cond = vae.encode(cond).latent_dist.sample() * vae_scale_factor
-                        # Concatenate along width dimension: (batch_size, 16, height, width*2)
-                        latents = torch.cat((latent_x, latent_cond), dim=3)
-                    else:
-                        latents = latent_x
-
-                latents_cpu = latents.cpu()
-
-                for latent, img_name in zip(latents_cpu, img_names, strict=True):
+                for latent, img_name in zip(latents, img_names, strict=True):
                     save_path = output_dir / f"{img_name}.safetensors"
                     futures.append(executor.submit(save_file, {"vae_enc": latent}, save_path))
 
@@ -251,62 +251,45 @@ def vae_encode_vitonhd(
 
 
 @app.command()
-def siglip_encode_vitonhd(
-    data_dir: str = typer.Option(..., help="Path to the VITONHD dataset directory."),
-    batch_size: int = typer.Option(default=64),
+def siglip_encode_images(
+    data_dir: str = typer.Option(..., help="Path to the dataset directory."),
+    batch_size: int = typer.Option(default=128),
+    data_name: str = typer.Option(..., help="Name of the dataset: ['vitonhd', 'dresscode']."),
 ):
-    """Encode images using SigLIP-B/16-512 for the VITON-HD dataset and save them using safetensors.
+    """Encode images using SigLIP-B/16-512 for the defined dataset and save them using safetensors.
 
     Examples:
-        $ python tryoffdiff/dataset.py siglip-encode-vitonhd \
-         --data-dir "<path-to-data-dir>"
+        $ python tryoffdiff_private/dataset.py siglip-encode-images \
+         --data-dir "<path-to-data-dir>" \
+         --data-name "vitonhd" \
+         --batch-size 128
     """
-
-    class CustomVitonDataset(Dataset):
-        def __init__(self, root_dir: Path, transform: transforms.Compose):
-            self.cond_dir = root_dir / "image"
-            self.image_filenames = [i.name for i in os.scandir(self.cond_dir) if i.is_file()]
-            self.transform = transform
-
-        def __len__(self) -> int:
-            return len(self.image_filenames)
-
-        def __getitem__(self, idx: int):
-            image_filename = self.image_filenames[idx]
-            cond_path = self.cond_dir / image_filename
-            cond_img = read_image(str(cond_path))
-            return self.transform(cond_img), image_filename
-
-    device = "cuda"
-    image_processor = SiglipImageProcessor.from_pretrained(
-        "google/siglip-base-patch16-512", do_resize=False, do_rescale=False, do_normalize=False
-    )
-    image_encoder = SiglipVisionModel.from_pretrained("google/siglip-base-patch16-512", device_map=device)
-    image_encoder.eval()
+    ckpt = "google/siglip-base-patch16-512"
+    image_processor = SiglipImageProcessor.from_pretrained(ckpt, do_resize=False, do_rescale=False, do_normalize=False)
+    image_encoder = SiglipVisionModel.from_pretrained(ckpt, device_map="cuda").eval()
 
     for split in ["train", "test"]:
         input_dir = Path(data_dir) / split
-        output_dir = Path(data_dir).parent / f"vitonhd-enc-siglip/{split}"
+        output_dir = Path(data_dir).parent / f"{data_name}-enc-siglip2" / split
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        dataset = CustomVitonDataset(root_dir=input_dir, transform=create_transform("siglip"))
+        dataset = CustomDataset(root_dir=input_dir, transform=create_transform("siglip"), folder="image")
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
 
-        total_batches = len(dataloader)
         with (
-            tqdm(total=total_batches, desc=f"Encoding {split}", unit="batch") as pbar,
+            tqdm(total=len(dataloader), desc=f"Encoding {split}", unit="batch") as pbar,
             ThreadPoolExecutor(max_workers=4) as executor,
         ):
             futures = []
             for batch in dataloader:
                 cond, img_names = batch
 
+                # Process batch on GPU
                 with torch.no_grad():
                     inputs = image_processor(images=cond, return_tensors="pt")
                     inputs = {k: v.to(image_encoder.device) for k, v in inputs.items()}
                     outputs = image_encoder(**inputs)
-                    image_feats = outputs.last_hidden_state  # [batch_size, 1024, 768]
-                image_feats = image_feats.cpu()
+                    image_feats = outputs.last_hidden_state.cpu()
 
                 for latent, img_name in zip(image_feats, img_names, strict=True):
                     save_path = output_dir / f"{img_name}.safetensors"
