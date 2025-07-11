@@ -166,17 +166,16 @@
         <!-- Text Column -->
         <div class="column">
           <h4 class="has-text-justified">
-            <b>Illustration of the relationship between Virtual Try-On (VTON) and Virtual Try-Off (VTOFF).</b><br>
-            Left: VTON focuses on transferring garments onto a person.
-            Right: VTOFF aims to reconstruct the garment itself from a worn instance.
-            These two tasks are inherently cyclic: the output of one can serve as the input to the other.<br>
-            This cyclical connection offers: (1) improved training through consistency constraints in the loss function [54],
-            (2) the generation of synthetic data for both tasks [9, 40].
-            Such synergy not only enhances model robustness but also opens new possibilities in fashion image generation.
-            Despite the growing interest in VTON, its inverse task, VTOFF, has received limited attention and remains
-            largely undefined in the literature. Furthermore, current VTON methods often assume the availability of
-            clean product images. Eliminating this dependency reduces the need for expensive photography and manual
-            editing, thereby enabling smaller vendors to produce professional-quality visuals more affordably.
+            <b>Illustration of the relationship between VTON and VTOFF.</b><br>
+            <i>Left</i>: VTON focuses on transferring garments onto a person.<br>
+            <i>Right</i>: VTOFF aims to reconstruct the garment itself from a worn instance.<br>
+            These two tasks form a cyclical relationship: the output of one can serve as the input to the other.
+            This synergy provides: (1) improved training through consistency-based loss functions, and
+            (2) the ability to generate synthetic data for both tasks.
+            Such interplay enhances robustness and enables innovative methods in fashion image generation.<br>
+            While VTON has garnered significant attention, VTOFF remains underexplored in research. Additionally, most
+            VTON methods rely on clean product images, which require costly photography and editing. By removing this
+            dependency, VTOFF can help smaller vendors create high-quality visuals more cost-effectively.
           </h4>
         </div>
       </div>
@@ -193,14 +192,18 @@
       <h2 class="title is-4 has-text-centered">Method</h2>
         <img src="static/images/model.png" alt="AI model architecture proposed in the paper"/>
       <h4 class="is-centered has-text-centered has-text-justified">
-        <b>Overview of TryOffDiff.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
-        (SigLIP-B/16) extracts features, resulting in a $(1024\times768)$ map. These features are refined by the <i>Adapter</i>, following IP-Adapter, to align with the cross-attention mechanism.
-        The adapted features, now of shape $(77\times768)$, are injected into the <i>Denoising U-Net</i> of Stable Diffusion-v1.4 by replacing the default text features in the cross-attention layers.
-        A class label $c \in \{\text{"upper-body"},\ \text{"lower-body"},\ \text{"dresses"}\}$ is mapped to a learnable embedding and added to the timestep embeddings of the diffusion model, conditioning the generation process on garment type.
-        The final latent output is decoded into pixel space by the <i>VAE Decoder</i> of SD-v1.4, yielding the reconstructed garment image $\hat{G}$.
+        <b>Multi-Garment TryOffDiff Overview.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
+        (SigLIP-B/16) extracts features, producing a $(1024\times768)$ feature map. These features are processed by the
+        <i>Adapter</i>, following IP-Adapter, to align with the cross-attention mechanism, resulting in features of
+        shape $(77\times768)$. These adapted features replace the default text features in the cross-attention layers of
+        the <i>Diffusion Model</i>, which is a modified version of the <i>Denoising U-Net</i> from Stable Diffusion-v1.4
+        A class label $c \in \{\text{"upper-body"},\ \text{"lower-body"},\ \text{"dresses"}\}$ is mapped to a learnable
+        embedding and integrated into the diffusion model's timestep embeddings, conditioning the generation on garment
+        type. The resulting latent output is decoded into pixel space by <i>VAE Decoder</i> of SD-v1.4, producing
+        the reconstructed garment image $\hat{G}$.
         <br>
-        We train four separate models: one each for upper-body, lower-body, and dresses, along with a multi-garment model that handles all classes.
-        All models are trained end-to-end using Mean Squared Error (MSE) loss, adhering to standard diffusion model training procedures.
+        We train four distinct models: one for each garment category (upper-body, lower-body, dresses) and a multi-garment model that supports all classes.
+        All models are trained end-to-end using Mean Squared Error (MSE) loss, adhering to standard diffusion model training protocols.
       </h4>
     </div>
   </div>
@@ -238,12 +241,12 @@
     year      = {2024},
     note      = {\url{https://doi.org/nt3n}}
 }
-@article{velioglu2025enhancing,
-    title     = {Enhancing Person-to-Person Virtual Try-On with Multi-Garment Virtual Try-Off},
-    author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
-    journal   = {arXiv preprint arXiv:2504.13078},
-    year      = {2025},
-    note      = {\url{https://doi.org/pn67}}
+@inproceedings{velioglu2025mgt,
+  title     = {MGT: Extending Virtual Try-Off to Multi-Garment Scenarios},
+  author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
+  booktitle = {ICCVW},
+  year      = {2025},
+  note      = {\url{https://doi.org/pn67}}
 }</code></pre>
   </div>
 </section>
