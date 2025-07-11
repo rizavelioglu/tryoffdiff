@@ -16,7 +16,7 @@ The official repository of the papers:
 ---
 
 ### 🎉 News
-- [2025-07-11]: Paper2 accepted at [ICCV'25 Workshop]((https://cvam-workshop.github.io/)), will be presented on Oct 20th, 2025.
+- [2025-07-11]: Paper2 accepted at [ICCV'25 Workshop](https://cvam-workshop.github.io/), will be presented on Oct 20th, 2025.
 - [2025-07-10]: Code for new features made available.
 - [2025-04-17]: Paper2 (follow-up work) appeared on arXiv with improvements, _e.g._ multi-garment try-off.
 - [2025-03-26]: Demo is accepted at [CVPR'25 Demo Track](https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20&zoom=180), presented on June 13, 2025.
