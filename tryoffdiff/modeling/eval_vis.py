@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms.v2 as transforms
 import typer
 
-from tryoffdiff.modeling.eval import VitonhdEvalDataset
+from tryoffdiff.modeling.eval import ImageDataset
 
 app = typer.Typer()
 
@@ -47,7 +47,7 @@ class ImageEvalGUI:
         self.root.bind("<Key>", self.handle_key_press)
 
     def prepare_dataloader(self):
-        dataset = VitonhdEvalDataset(self.gt_dir, self.pred_dir)
+        dataset = ImageDataset(self.gt_dir, self.pred_dir)
         return iter(DataLoader(dataset, batch_size=1))
 
     def prepare_metrics(self):
