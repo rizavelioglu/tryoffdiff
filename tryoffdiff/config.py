@@ -1,8 +1,8 @@
+from dataclasses import dataclass, field, is_dataclass
+from datetime import datetime
 import inspect
 import json
 import os
-from dataclasses import dataclass, field, is_dataclass
-from datetime import datetime
 from pathlib import Path
 
 import typer
@@ -67,7 +67,7 @@ class TrainingConfig:
     save_dir: str                    = typer.Option(...,           help="Directory to save model checkpoints and logs.")
     data_dir: str                    = typer.Option(...,           help="Directory containing the dataset.")
     model_class_name: str            = typer.Option(...,           help="Model class name to instantiate.")
-    dataset_type: str                = typer.Option("mask",        help="Conditioning clothing image type: 'original' (raw sample) or 'mask' (masked).")
+    dataset_type: str                = typer.Option("",            help="One of ['dresscode', 'dc-upperbody', 'dc-lowerbody', 'dc-dresses']. Leave empty for VITON-HD dataset.")
     train_batch_size: int            = typer.Option(16,            help="Batch size for training.")
     eval_batch_size: int             = typer.Option(16,            help="Batch size for evaluation.")
     num_epochs: int                  = typer.Option(500,           help="Number of training epochs")
@@ -76,7 +76,7 @@ class TrainingConfig:
     learning_rate: float             = typer.Option(1e-4,          help="Learning rate for the optimizer.")
     save_image_epochs: int           = typer.Option(50,            help="Save generated images every n epochs.")
     save_model_epochs: int           = typer.Option(50,            help="Save model checkpoint every n epochs.")
-    mixed_precision: str             = typer.Option("fp16",        help="Mixed precision mode, e.g., 'fp16' or 'no'")
+    mixed_precision: str             = typer.Option("no",          help="Mixed precision mode, e.g., 'fp16' or 'no'")
     logger: str                      = typer.Option("tensorboard", help="Logging backend to use.")
     device: str                      = typer.Option("cuda",        help="Device to use for training. Options are 'cuda' or 'cpu'.")
     checkpoint_every_n_epochs: int   = typer.Option(50,            help="Number of epochs between checkpoint saving.")

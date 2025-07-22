@@ -119,14 +119,15 @@ def clean_vitonhd(
 
 def load_vae_model(model_name: str, device: str) -> AutoencoderKL:
     """Load and return the VAE model specified by `model_name`."""
-    model_paths: dict[str, str] = {
-        "sd14": "CompVis/stable-diffusion-v1-4",
-        "sdxl": "stabilityai/stable-diffusion-xl-base-1.0",
-        "sd3": "stabilityai/stable-diffusion-3-medium-diffusers",
+    model_paths: dict[str, tuple] = {
+        "sd14": ("CompVis/stable-diffusion-v1-4", "vae"),  # latent_channels=4
+        "sd-vae": ("stabilityai/sd-vae-ft-mse", ""),  # latent_channels=4
+        "sdxl": ("stabilityai/sdxl-vae", ""),  # latent_channels=4
+        "sd3": ("stabilityai/stable-diffusion-3-medium-diffusers", "vae"),  # latent_channels=16
+        "flux-1": ("black-forest-labs/FLUX.1-dev", "vae"),  # # latent_channels=16
     }
-    vae_path = model_paths.get(model_name)
-    vae = AutoencoderKL.from_pretrained(vae_path, subfolder="vae").to(device)
-    vae.eval()
+    vae_path, subfolder = model_paths.get(model_name)
+    vae = AutoencoderKL.from_pretrained(vae_path, subfolder=subfolder).eval().to(device)
     logger.info(f"Loaded VAE model from: {vae_path}")
     return vae
 
@@ -154,14 +155,28 @@ def create_transform(model_name: str) -> transforms.Compose:
 
     name_to_transform = {
         "sd14": base_transform,
+        "sd-vae": base_transform,
         "sdxl": transforms.Compose(
             [
-                PadToSquare(),  # Custom transform to pad the image to a square
+                PadToSquare(),
                 transforms.ToDtype(torch.float32, scale=True),
                 transforms.Normalize(mean=[0.5], std=[0.5]),
             ]
         ),
-        "sd3": base_transform,
+        "sd3": transforms.Compose(
+            [
+                PadToSquare(),
+                transforms.ToDtype(torch.float32, scale=True),
+                transforms.Normalize(mean=[0.5], std=[0.5]),
+            ]
+        ),
+        "flux-1": transforms.Compose(
+            [
+                PadToSquare(),
+                transforms.ToDtype(torch.float32, scale=True),
+                transforms.Normalize(mean=[0.5], std=[0.5]),
+            ]
+        ),
         "siglip": base_transform,
     }
     return name_to_transform.get(model_name)
@@ -192,7 +207,9 @@ class CustomDataset(Dataset):
 @app.command()
 def vae_encode_dataset(
     data_dir: str = typer.Option(..., help="Path to the dataset directory."),
-    model_name: str = typer.Option("sd14", help="Abbreviation of the VAE model: ['sd14', 'sdxl', 'sd3']."),
+    model_name: str = typer.Option(
+        "sd14", help="Abbreviation of the VAE model: ['sd14', 'sd-vae', 'sdxl', 'sd3', 'flux-1']."
+    ),
     batch_size: int = typer.Option(default=8),
     data_name: str = typer.Option(..., help="Name of the dataset: ['vitonhd', 'dresscode']."),
 ):
