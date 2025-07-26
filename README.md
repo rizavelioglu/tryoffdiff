@@ -16,6 +16,7 @@ The official repository of the papers:
 ---
 
 ### 🎉 News
+- [2025-07-25]: Paper1 accepted at [BMVC'25](https://bmvc2025.bmva.org/), will be presented on Nov 24-27, 2025 (tbd).
 - [2025-07-11]: Paper2 accepted at [ICCV'25 Workshop](https://cvam-workshop.github.io/), will be presented on Oct 20th, 2025.
 - [2025-07-10]: Code for new features made available.
 - [2025-04-17]: Paper2 (follow-up work) appeared on arXiv with improvements, _e.g._ multi-garment try-off.
@@ -75,11 +76,11 @@ The code, datasets, and models are published under the [Server Side Public Licen
 ### Citation
 If you find this repository useful in your research, please consider giving a star ⭐ and a citation:
 ```
-@article{velioglu2024tryoffdiff,
+@inproceedings{velioglu2025tryoffdiff,
   title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
   author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
-  journal   = {arXiv preprint arXiv:2411.18350},
-  year      = {2024},
+  booktitle = {BMVC},
+  year      = {2025},
   note      = {\url{https://doi.org/nt3n}}
 }
 @inproceedings{velioglu2025mgt,
