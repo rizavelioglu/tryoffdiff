@@ -232,14 +232,18 @@
 
 <!-- BibTeX Citation -->
 <section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
+  <div class="container is-max-desktop content" style="position: relative;">
     <h3 class="title">BibTeX</h3>
-    <pre><code>@article{velioglu2024tryoffdiff,
-    title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
-    author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
-    journal   = {arXiv preprint arXiv:2411.18350},
-    year      = {2024},
-    note      = {\url{https://doi.org/nt3n}}
+    <button id="copy-bibtex-btn" class="button is-small is-light" style="position: absolute; top: 1.5rem; right: 1rem; display: flex; align-items: center; gap: 0.5em;">
+      <span id="copy-bibtex-icon" class="fa-regular fa-copy"></span>
+      <span id="copy-bibtex-text">Copy</span>
+    </button>
+    <pre><code id="bibtex-code">@inproceedings{velioglu2025tryoffdiff,
+  title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
+  author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
+  booktitle = {BMVC},
+  year      = {2025},
+  note      = {\url{https://doi.org/nt3n}}
 }
 @inproceedings{velioglu2025mgt,
   title     = {MGT: Extending Virtual Try-Off to Multi-Garment Scenarios},
@@ -249,6 +253,16 @@
   note      = {\url{https://doi.org/pn67}}
 }</code></pre>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('copy-bibtex-btn').onclick = function() {
+        navigator.clipboard.writeText(document.getElementById('bibtex-code').textContent);
+        const text = document.getElementById('copy-bibtex-text');
+        text.textContent = 'Copied!';
+        setTimeout(() => { text.textContent = 'Copy'; }, 1200);
+      };
+    });
+  </script>
 </section>
 <!-- BibTeX Citation -->
 
@@ -264,7 +278,7 @@
       <a class="icon-link" href='https://clustrmaps.com/site/1c3xn'  title='Visit tracker'><img src='//clustrmaps.com/map_v2.png?cl=ffffff&w=50&t=n&d=qsAdtxX9f7sThV5zkXu92PDz7wIIoTf4PSMpfFkP9mE' style="vertical-align: middle;"/></a>
     </div>
     <div class="columns is-centered">
-      <div class="column is-10">
+      <div class="column is-7">
         <div class="content">
           <p style="font-size:12px;">
             This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
