@@ -3,7 +3,6 @@ _out/
 .aim/
 models/
 reports/
-notebooks/
 
 # Data
 /data/
