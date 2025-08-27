@@ -29,7 +29,6 @@ dependencies = [
     "loguru>=0.7.3",
     "pre-commit>=4.2.0",
     "typer>=0.15.1",
-    "torchmetrics>=1.7.4",
     "dists-pytorch>=0.1",
     "clean-fid>=0.1.35",
 ]

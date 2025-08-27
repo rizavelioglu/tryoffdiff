@@ -289,19 +289,8 @@ def train_tryoffdiffv2(config: TrainingConfig):
                 else:
                     adapter_params_decay.append(param)
 
-        # Determine if UNet is pretrained or from scratch
-        is_pretrained_unet = config.model_class_name in [
-            "Ablation2",
-            "Ablation4",
-            "Ablation11",
-            "Ablation12",
-            "Ablation14",
-        ]
-
-        # Add parameter groups with appropriate learning rates
         # UNet parameters
-        unet_lr_multiplier = 1.0 if is_pretrained_unet else 5.0  # Higher LR for from-scratch UNet
-        add_to_param_groups(unet_params_decay, unet_params_no_decay, "unet", unet_lr_multiplier)
+        add_to_param_groups(unet_params_decay, unet_params_no_decay, "unet", lr_multiplier=1.0)
 
         # Adapter parameters (if present)
         if len(adapter_params_decay) > 0 or len(adapter_params_no_decay) > 0:

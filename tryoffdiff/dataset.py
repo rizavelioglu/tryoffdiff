@@ -124,7 +124,7 @@ def load_vae_model(model_name: str, device: str) -> AutoencoderKL:
         "sd-vae": ("stabilityai/sd-vae-ft-mse", ""),  # latent_channels=4
         "sdxl": ("stabilityai/sdxl-vae", ""),  # latent_channels=4
         "sd3": ("stabilityai/stable-diffusion-3-medium-diffusers", "vae"),  # latent_channels=16
-        "flux-1": ("black-forest-labs/FLUX.1-dev", "vae"),  # # latent_channels=16
+        "flux-1": ("black-forest-labs/FLUX.1-dev", "vae"),  # latent_channels=16
     }
     vae_path, subfolder = model_paths.get(model_name)
     vae = AutoencoderKL.from_pretrained(vae_path, subfolder=subfolder).eval().to(device)
@@ -276,7 +276,7 @@ def siglip_encode_images(
     """Encode images using SigLIP-B/16-512 for the defined dataset and save them using safetensors.
 
     Examples:
-        $ python tryoffdiff_private/dataset.py siglip-encode-images \
+        $ python tryoffdiff/dataset.py siglip-encode-images \
          --data-dir "<path-to-data-dir>" \
          --data-name "vitonhd" \
          --batch-size 128
@@ -287,7 +287,7 @@ def siglip_encode_images(
 
     for split in ["train", "test"]:
         input_dir = Path(data_dir) / split
-        output_dir = Path(data_dir).parent / f"{data_name}-enc-siglip2" / split
+        output_dir = Path(data_dir).parent / f"{data_name}-enc-siglip" / split
         output_dir.mkdir(parents=True, exist_ok=True)
 
         dataset = CustomDataset(root_dir=input_dir, transform=create_transform("siglip"), folder="image")
