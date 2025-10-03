@@ -16,7 +16,7 @@ The official repository of the papers:
 ---
 
 ### 🎉 News
-- [2025-09-01]: Demos is accepted at [ICCV'25](https://media.eventhosts.cc/Conferences/ICCV2025/iccv25_main_program.pdf#page=28&zoom=180), will be presented on Oct 21st, 2025.
+- [2025-09-01]: Demo is accepted at [ICCV'25 Demo Track](https://media.eventhosts.cc/Conferences/ICCV2025/iccv25_main_program.pdf#page=28&zoom=180), will be presented on Oct 21st, 2025.
 - [2025-07-25]: Paper1 accepted at [BMVC'25](https://bmvc2025.bmva.org/), will be presented on Nov 24-27, 2025 (tbd).
 - [2025-07-11]: Paper2 accepted at [ICCV'25 Workshop](https://cvam-workshop.github.io/), will be presented on Oct 20th, 2025.
 - [2025-07-10]: Code for new features made available.
