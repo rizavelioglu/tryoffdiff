@@ -287,7 +287,7 @@ def main(
         pred_batch = pred_batch.to(evaluator.device, non_blocking=True)
 
         # Update metrics
-        evaluator.update(pred_batch, gt_batch)
+        evaluator.update(gt_batch, pred_batch)
 
     # Compute final results
     results = evaluator.compute()
