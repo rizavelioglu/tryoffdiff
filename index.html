@@ -1,53 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description"
-        content="TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models">
-  <meta name="keywords" content="Diffusion, GenAI, Image Generation">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TryOffDiff</title>
+  <meta name="theme-color" content="#ffffff">
 
-  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <title>TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models</title>
+  <meta name="description"
+        content="TryOffDiff reconstructs a clean garment image from a photo of a person wearing it, using a diffusion model conditioned on SigLIP image features.">
+  <meta name="keywords" content="Virtual Try-Off, VTOFF, Diffusion Models, Stable Diffusion, SigLIP, Garment Reconstruction, Fashion Image Generation, CVPR, BMVC, ICCV">
+  <meta name="author" content="Riza Velioglu, Petra Bevandić, Robin Chan, Barbara Hammer">
+
+  <!-- Open Graph / social previews -->
+  <link rel="canonical" href="https://rizavelioglu.github.io/tryoffdiff/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction">
+  <meta property="og:description" content="A diffusion-based method for reconstructing garment images from photos of people wearing them.">
+  <meta property="og:url" content="https://rizavelioglu.github.io/tryoffdiff/">
+  <meta property="og:image" content="https://rizavelioglu.github.io/tryoffdiff/static/images/model.webp">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="786">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@rizavelioglu">
+  <meta name="twitter:title" content="TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction">
+  <meta name="twitter:description" content="A diffusion-based method for reconstructing garment images from photos of people wearing them.">
+  <meta name="twitter:image" content="https://rizavelioglu.github.io/tryoffdiff/static/images/model.webp">
+
+  <!-- Favicons -->
+  <link rel="icon" href="./static/images/favicon.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="./static/images/apple-touch-icon.png">
+
+  <!-- Google Fonts: preconnect + display=swap to avoid FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans&display=swap">
+
+  <!-- Local CSS -->
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+
+  <!-- CDN CSS pinned to specific versions with Subresource Integrity -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.1/css/all.min.css"
+        integrity="sha256-Mg1XLfuETnFSSAt7YjdCNsSJbMyjrJ1puwPzvCA0rLg="
+        crossorigin="anonymous">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1.9.4/css/academicons.min.css"
+        integrity="sha256-1oz1+rx2BF/9OiBUPSh1NEUwyUECNU5O70RoKnClGNs="
+        crossorigin="anonymous">
+
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
+    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', '{{ site.google_analytics }}');
   </script>
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
-
-  <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/favicon.png">
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/js/all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
-
-  <!-- Required for rendering LaTeX equations -->
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- MathJax: smaller TeX-only bundle, pinned + SRI -->
   <script>
-  MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']]
-    }
-  };
-</script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+  </script>
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"
+          integrity="sha256-Cm3tWrvOEzMWWN0jnzQ4Kr0GSSx0txth6MqoES7FX6U="
+          crossorigin="anonymous"></script>
 
+  <!-- Carousel (no jQuery) -->
+  <script defer src="./static/js/bulma-carousel.min.js"></script>
+  <script defer src="./static/js/index.js"></script>
 </head>
 <body>
 
@@ -57,18 +81,19 @@
       <div class="columns is-centered">
         <div class="column has-text-centered">
           <p class="is-size-6 has-text-grey">
-            <a href="https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20" target="_blank" rel="noopener noreferrer">[CVPR'25-Demo]</a>
+            <a href="https://media.eventhosts.cc/Conferences/CVPR2025/CVPR_main_conf_2025.pdf#page=20"
+               target="_blank" rel="noopener noreferrer">[CVPR'25-Demo]</a>
           </p>
           <h1 class="title is-1 publication-title">TryOffDiff: <br>Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="https://rizavelioglu.github.io/">Riza Velioglu</a>,</span>
+              <a href="https://rizavelioglu.github.io/" target="_blank" rel="noopener noreferrer">Riza Velioglu</a>,</span>
             <span class="author-block">
-              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/460726592/">Petra Bevandić</a>,</span>
+              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/460726592/" target="_blank" rel="noopener noreferrer">Petra Bevandić</a>,</span>
             <span class="author-block">
-              <a href="https://robinchan.de/">Robin Chan</a>,</span>
+              <a href="https://robinchan.de/" target="_blank" rel="noopener noreferrer">Robin Chan</a>,</span>
             <span class="author-block">
-              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/18302458/">Barbara Hammer</a>
+              <a href="https://hammer-lab.techfak.uni-bielefeld.de/people/18302458/" target="_blank" rel="noopener noreferrer">Barbara Hammer</a>
             </span>
           </div>
 
@@ -78,71 +103,52 @@
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- arXiv Link. -->
               <span class="link-block">
                 <a href="https://arxiv.org/abs/2411.18350"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>Paper#1</span>
+                   target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark"
+                   aria-label="BMVC 2025 paper on arXiv">
+                  <span class="icon"><i class="ai ai-arxiv" aria-hidden="true"></i></span>
+                  <span>BMVC'25</span>
                 </a>
               </span>
               <span class="link-block">
                 <a href="https://arxiv.org/abs/2504.13078"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>Paper#2</span>
+                   target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark"
+                   aria-label="ICCVW 2025 paper on arXiv">
+                  <span class="icon"><i class="ai ai-arxiv" aria-hidden="true"></i></span>
+                  <span>ICCVW'25</span>
                 </a>
               </span>
-              <!-- Video Link. -->
-<!--              <span class="link-block">-->
-<!--                <a href="https://www.youtube.com/..."-->
-<!--                   class="external-link button is-normal is-rounded is-dark">-->
-<!--                  <span class="icon">-->
-<!--                      <i class="fa-brands fa-youtube"></i>-->
-<!--                  </span>-->
-<!--                  <span>Video(soon)</span>-->
-<!--                </a>-->
-<!--              </span>-->
-              <!-- Code Link. -->
               <span class="link-block">
                 <a href="https://github.com/rizavelioglu/tryoffdiff/"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fa-brands fa-github"></i>
-                  </span>
+                   target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark"
+                   aria-label="Source code on GitHub">
+                  <span class="icon"><i class="fa-brands fa-github" aria-hidden="true"></i></span>
                   <span>Code</span>
-                  </a>
+                </a>
               </span>
-              <!-- Dataset Link. -->
-<!--              <span class="link-block">-->
-<!--                <a href="https://huggingface.co/datasets/rizavelioglu/..."-->
-<!--                   class="external-link button is-normal is-rounded is-dark">-->
-<!--                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"-->
-<!--                       style="margin-left: -10px; margin-right: 5px">-->
-<!--                  <span>Data(soon)</span>-->
-<!--                  </a>-->
-<!--              </span>-->
-              <!-- Model Link. -->
               <span class="link-block">
                 <a href="https://huggingface.co/rizavelioglu/tryoffdiff"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"
-                       style="margin-left: -10px; margin-right: 5px">
+                   target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark"
+                   aria-label="Model weights on Hugging Face">
+                  <img alt="" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25" height="25"
+                       style="margin-left: -10px; margin-right: 5px" loading="lazy" decoding="async">
                   <span>Model</span>
-                  </a>
+                </a>
               </span>
-              <!-- HF Spaces Link. -->
               <span class="link-block">
                 <a href="https://huggingface.co/spaces/rizavelioglu/tryoffdiff"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <img alt="Spaces" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25"
-                       style="margin-left: -10px; margin-right: 5px">
+                   target="_blank" rel="noopener noreferrer"
+                   class="external-link button is-normal is-rounded is-dark"
+                   aria-label="Interactive demo on Hugging Face Spaces">
+                  <img alt="" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="25" height="25"
+                       style="margin-left: -10px; margin-right: 5px" loading="lazy" decoding="async">
                   <span>Demo</span>
-                  </a>
+                </a>
               </span>
             </div>
           </div>
@@ -152,19 +158,24 @@
   </div>
 </section>
 
-<!-- VTOFF image -->
+<!-- Problem Statement -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <h2 class="title is-4 has-text-centered">Problem Statement</h2>
       <div class="columns is-vcentered">
-        <!-- Image Column -->
         <div class="column is-one-third has-text-centered">
-          <img src="static/images/TryOn-TryOff.png" alt="Illustration of the relationship between Virtual Try-On and Virtual Try-Off." style="max-width: 100%; height: auto;">
+          <picture>
+            <source type="image/webp" srcset="static/images/TryOn-TryOff.webp">
+            <img src="static/images/TryOn-TryOff.jpg"
+                 alt="Diagram comparing Virtual Try-On (left, dressing a person) with Virtual Try-Off (right, extracting a flat garment image from a photo of a person wearing it)."
+                 width="800" height="845"
+                 loading="lazy" decoding="async"
+                 style="max-width: 100%; height: auto;">
+          </picture>
         </div>
-        <!-- Text Column -->
         <div class="column">
-          <h4 class="has-text-justified">
+          <p class="content-text">
             <b>Illustration of the relationship between VTON and VTOFF.</b><br>
             <i>Left</i>: VTON focuses on transferring garments onto a person.<br>
             <i>Right</i>: VTOFF aims to reconstruct the garment itself from a worn instance.<br>
@@ -175,27 +186,36 @@
             While VTON has garnered significant attention, VTOFF remains underexplored in research. Additionally, most
             VTON methods rely on clean product images, which require costly photography and editing. By removing this
             dependency, VTOFF can help smaller vendors create high-quality visuals more cost-effectively.
-          </h4>
+          </p>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- VTOFF image -->
 
-
-<!-- Model Architecture -->
+<!-- Method -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <h2 class="title is-4 has-text-centered">Method</h2>
-        <img src="static/images/model.png" alt="AI model architecture proposed in the paper"/>
-      <h4 class="is-centered has-text-centered has-text-justified">
+      <picture>
+        <source type="image/webp"
+                srcset="static/images/model.webp 1600w, static/images/model@2x.webp 3200w"
+                sizes="(max-width: 960px) 100vw, 960px">
+        <img src="static/images/model.jpg"
+             srcset="static/images/model.jpg 1600w"
+             sizes="(max-width: 960px) 100vw, 960px"
+             alt="Multi-Garment TryOffDiff architecture: a reference image is encoded by SigLIP-B/16, adapted via an IP-Adapter into 77×768 cross-attention features, fed into a modified Stable Diffusion-v1.4 U-Net (with a learnable garment-class embedding added to the timestep), and the resulting latent is decoded by the SD-v1.4 VAE into the reconstructed garment image."
+             width="1600" height="786"
+             loading="lazy" decoding="async"
+             style="max-width: 100%; height: auto;">
+      </picture>
+      <p class="content-text">
         <b>Multi-Garment TryOffDiff Overview.</b> Given a reference image $I$ of size $(1024\times768\times3)$, the <i>Image Encoder</i>
         (SigLIP-B/16) extracts features, producing a $(1024\times768)$ feature map. These features are processed by the
         <i>Adapter</i>, following IP-Adapter, to align with the cross-attention mechanism, resulting in features of
         shape $(77\times768)$. These adapted features replace the default text features in the cross-attention layers of
-        the <i>Diffusion Model</i>, which is a modified version of the <i>Denoising U-Net</i> from Stable Diffusion-v1.4
+        the <i>Diffusion Model</i>, which is a modified version of the <i>Denoising U-Net</i> from Stable Diffusion-v1.4.
         A class label $c \in \{\text{"upper-body"},\ \text{"lower-body"},\ \text{"dresses"}\}$ is mapped to a learnable
         embedding and integrated into the diffusion model's timestep embeddings, conditioning the generation on garment
         type. The resulting latent output is decoded into pixel space by <i>VAE Decoder</i> of SD-v1.4, producing
@@ -203,40 +223,57 @@
         <br>
         We train four distinct models: one for each garment category (upper-body, lower-body, dresses) and a multi-garment model that supports all classes.
         All models are trained end-to-end using Mean Squared Error (MSE) loss, adhering to standard diffusion model training protocols.
-      </h4>
+      </p>
     </div>
   </div>
 </section>
-<!-- Model Architecture -->
 
-
-<!-- Image carousel -->
+<!-- Results -->
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-4 has-text-centered">Results</h2>
       <div id="teaser-carousel" class="carousel teaser-carousel">
-        <div class="item"><img src="static/images/whole_test_1.jpg" alt="Bounding box predictions on a shoe product image."/></div>
-        <div class="item"><img src="static/images/whole_test_2.jpg" alt="Bounding box predictions on a bag product image."/></div>
+        <div class="item">
+          <picture>
+            <source type="image/webp"
+                    srcset="static/images/whole_test_1.webp 1200w, static/images/whole_test_1@2x.webp 2400w"
+                    sizes="(max-width: 1200px) 100vw, 1200px">
+            <img src="static/images/whole_test_1.jpg"
+                 alt="Grid of TryOffDiff outputs on VITON-HD-test: rows of source try-on photos paired with the model's reconstructed flat garment images."
+                 width="1200" height="1200"
+                 loading="lazy" decoding="async">
+          </picture>
+        </div>
+        <div class="item">
+          <picture>
+            <source type="image/webp"
+                    srcset="static/images/whole_test_2.webp 1200w, static/images/whole_test_2@2x.webp 2400w"
+                    sizes="(max-width: 1200px) 100vw, 1200px">
+            <img src="static/images/whole_test_2.jpg"
+                 alt="Second grid of TryOffDiff outputs on VITON-HD-test, showing additional source-to-reconstruction pairs."
+                 width="1200" height="1200"
+                 loading="lazy" decoding="async">
+          </picture>
+        </div>
       </div>
-      <!-- Add a single caption covering all the images -->
-      <h4 class="has-text-centered">
-        Predictions of <i>TryOffDiff</i> on the samples from the <i>VITON-HD-test</i> set.
-      </h4>
+      <p class="has-text-centered">
+        Predictions of <i>TryOffDiff</i> on samples from the <i>VITON-HD-test</i> set.
+      </p>
     </div>
   </div>
 </section>
-<!-- End image carousel -->
-
 
 <!-- BibTeX Citation -->
 <section class="section" id="BibTeX">
-  <div class="container is-max-desktop content" style="position: relative;">
-    <h3 class="title">BibTeX</h3>
-    <button id="copy-bibtex-btn" class="button is-small is-light" style="position: absolute; top: 1.5rem; right: 1rem; display: flex; align-items: center; gap: 0.5em;">
-      <span id="copy-bibtex-icon" class="fa-regular fa-copy"></span>
-      <span id="copy-bibtex-text">Copy</span>
-    </button>
+  <div class="container is-max-desktop content">
+    <div class="bibtex-header">
+      <h3 class="title bibtex-title">BibTeX</h3>
+      <button id="copy-bibtex-btn" class="button is-small is-light" type="button" aria-label="Copy BibTeX to clipboard">
+        <span id="copy-bibtex-icon" class="fa-regular fa-copy" aria-hidden="true"></span>
+        <span id="copy-bibtex-text">Copy</span>
+      </button>
+    </div>
     <pre><code id="bibtex-code">@inproceedings{velioglu2025tryoffdiff,
   title     = {TryOffDiff: Virtual-Try-Off via High-Fidelity Garment Reconstruction using Diffusion Models},
   author    = {Velioglu, Riza and Bevandic, Petra and Chan, Robin and Hammer, Barbara},
@@ -252,37 +289,30 @@
   note      = {\url{https://doi.org/pn67}}
 }</code></pre>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('copy-bibtex-btn').onclick = function() {
-        navigator.clipboard.writeText(document.getElementById('bibtex-code').textContent);
-        const text = document.getElementById('copy-bibtex-text');
-        text.textContent = 'Copied!';
-        setTimeout(() => { text.textContent = 'Copy'; }, 1200);
-      };
-    });
-  </script>
 </section>
-<!-- BibTeX Citation -->
-
 
 <footer class="footer" style="padding: 1rem 0;">
   <div class="container">
     <div class="content has-text-centered">
-      <a class="icon-link" href="https://rizavelioglu.github.io/"><i class="fa-solid fa-house"></i></a>
-      <a class="icon-link" href="https://github.com/rizavelioglu"><i class="fa-brands fa-square-github"></i></a>
-      <a class="icon-link" href="https://x.com/rizavelioglu"><i class="fa-brands fa-square-x-twitter"></i></a>
-      <a class="icon-link" href="https://linkedin.com/in/veliogluriza"><i class="fa-brands fa-linkedin"></i></a>
-      <a class="icon-link" href="https://scholar.google.com/citations?user=bEGGmqgAAAAJ"><i class="ai ai-google-scholar-square"></i></a>
-      <a class="icon-link" href='https://clustrmaps.com/site/1c3xn'  title='Visit tracker'><img src='//clustrmaps.com/map_v2.png?cl=ffffff&w=50&t=n&d=qsAdtxX9f7sThV5zkXu92PDz7wIIoTf4PSMpfFkP9mE' style="vertical-align: middle;"/></a>
+      <a class="icon-link" href="https://rizavelioglu.github.io/" target="_blank" rel="noopener noreferrer" aria-label="Personal homepage">
+        <i class="fa-solid fa-house" aria-hidden="true"></i></a>
+      <a class="icon-link" href="https://github.com/rizavelioglu" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+        <i class="fa-brands fa-square-github" aria-hidden="true"></i></a>
+      <a class="icon-link" href="https://x.com/rizavelioglu" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter) profile">
+        <i class="fa-brands fa-square-x-twitter" aria-hidden="true"></i></a>
+      <a class="icon-link" href="https://linkedin.com/in/veliogluriza" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+        <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>
+      <a class="icon-link" href="https://scholar.google.com/citations?user=bEGGmqgAAAAJ" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar profile">
+        <i class="ai ai-google-scholar-square" aria-hidden="true"></i></a>
     </div>
     <div class="columns is-centered">
       <div class="column is-7">
         <div class="content">
           <p style="font-size:12px;">
-            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a> and is adopted from <a href="https://nerfies.github.io/">Nerfies</a>.
-            <br>Please remember to remove the analytics code as well as the clustrmaps link before deploying your own website.
+            This website is licensed under a
+            <a rel="license noopener noreferrer" target="_blank" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+            and is adapted from
+            <a target="_blank" rel="noopener noreferrer" href="https://nerfies.github.io/">Nerfies</a>.
           </p>
         </div>
       </div>

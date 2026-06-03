@@ -40,6 +40,8 @@ plugins:
 #
 exclude:
   - models/
+  - _preview.html
+  - README.md
 #   - .sass-cache/
 #   - .jekyll-cache/
 #   - gemfiles/
